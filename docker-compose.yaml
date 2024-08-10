@@ -1,0 +1,22 @@
+services:
+  go_api:
+    container_name: go_api
+    volumes:
+      - ./backend/:/api/src
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    tty: true
+    stdin_open: true
+    ports:
+      - 8080:8080 
+  
+  react_app:
+    container_name: react_app
+    volumes:
+      - ./frontend/react_app/:/usr/src/app
+    build: ./frontend/react_app
+    tty: true
+    stdin_open: true
+    ports:
+      - 3000:3000
