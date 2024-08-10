@@ -4,14 +4,15 @@ import './App.css';
 const App = () => {
     const [tasks, setTasks] = useState([]);
     const [newTaskName, setNewTaskName] = useState('');
-
+    const [selectedTaskId, setSelectedTaskId] = useState(null); // 選択されたタスクのIDを保持
+    
     useEffect(() => {
-        fetchTasks();
+        getTasks();
     }, []);
 
-    const fetchTasks = async () => {
+    const getTasks = async () => {
         try {
-            const response = await fetch('/tasks');
+            const response = await fetch('http://localhost:8080/tasks');
             const data = await response.json();
             setTasks(data);
         } catch (error) {
@@ -23,7 +24,7 @@ const App = () => {
         if (newTaskName.trim() === '') return;
 
         try {
-            const response = await fetch('/tasks', {
+            const response = await fetch('http://localhost:8080/tasks', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -31,7 +32,7 @@ const App = () => {
                 body: JSON.stringify({ name: newTaskName }),
             });
             if (response.ok) {
-                fetchTasks();
+                getTasks();
                 setNewTaskName('');
             }
         } catch (error) {
@@ -39,9 +40,13 @@ const App = () => {
         }
     };
 
-    const toggleTaskDone = async (task) => {
+    const toggleTaskDone = async () => {
+        if (selectedTaskId === null) return;
+
+        const task = tasks.find(task => task.id === selectedTaskId);
+        if (!task) return;
         try {
-            const response = await fetch(`/tasks/${task.id}`, {
+            const response = await fetch(`http://localhost:8080/tasks/${task.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -49,11 +54,36 @@ const App = () => {
                 body: JSON.stringify({ ...task, done: !task.done }),
             });
             if (response.ok) {
-                fetchTasks();
+                getTasks();
+                setSelectedTaskId(null); // 操作後に選択状態を解除
             }
         } catch (error) {
             console.error('タスクの更新に失敗しました:', error);
         }
+    };
+
+    const deleteTask = async () => {
+        if (selectedTaskId === null) return;
+        const task = tasks.find(task => task.id === selectedTaskId);
+        if (!task) return;
+        try {
+            const response = await fetch(`http://localhost:8080/tasks/${task.id}`, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                // タスク削除後にタスクリストを再取得
+                getTasks();
+                setSelectedTaskId(null); // 削除後に選択状態を解除
+            } else {
+                console.error('タスクの削除に失敗しました:', response.statusText);
+            }
+        } catch (error) {
+            console.error('タスクの削除に失敗しました:', error);
+        }
+    };
+
+    const handleTaskClick = (taskId) => {
+        setSelectedTaskId(taskId);
     };
 
     return (
@@ -66,18 +96,24 @@ const App = () => {
                 placeholder="新しいタスクを追加" 
             />
             <button onClick={addTask}>追加</button>
+            <div>
+                <button onClick={toggleTaskDone}>終了</button>
+                <button onClick={deleteTask}>削除</button>
+            </div>
             <ul>
                 {tasks.map(task => (
-                    <li key={task.id}>
-                        <label style={{ textDecoration: task.done ? 'line-through' : 'none' }}>
-                            <input 
-                                type="checkbox" 
-                                checked={task.done} 
-                                onChange={() => toggleTaskDone(task)} 
-                            />
-                            {task.name}
-                        </label>
-                    </li>
+                    <li 
+                    key={task.id} 
+                    onClick={() => handleTaskClick(task.id)} 
+                    style={{
+                        cursor: 'pointer',
+                        backgroundColor: task.id === selectedTaskId ? '#f0f0f0' : 'white'
+                    }}
+                >
+                    <label style={{ textDecoration: task.done ? 'line-through' : 'none' }}>
+                        {task.name}
+                    </label>
+                </li>
                 ))}
             </ul>
         </div>
