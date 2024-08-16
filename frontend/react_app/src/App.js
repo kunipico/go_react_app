@@ -10,9 +10,12 @@ const App = () => {
         getTasks();
     }, []);
 
+    // const goAppEndpoint = process.env.GO_APP_ENDPOINT || 'http://localhost:8080';
+    const goAppEndpoint = 'http://go-api.go-react-app:8080';
+
     const getTasks = async () => {
         try {
-            const response = await fetch('http://localhost:8080/tasks');
+            const response = await fetch(`${goAppEndpoint}/tasks`);
             const data = await response.json();
             setTasks(data);
         } catch (error) {
@@ -24,7 +27,7 @@ const App = () => {
         if (newTaskName.trim() === '') return;
 
         try {
-            const response = await fetch('http://localhost:8080/tasks', {
+            const response = await fetch(`${goAppEndpoint}/tasks`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -46,7 +49,7 @@ const App = () => {
         const task = tasks.find(task => task.id === selectedTaskId);
         if (!task) return;
         try {
-            const response = await fetch(`http://localhost:8080/tasks/${task.id}`, {
+            const response = await fetch(`${goAppEndpoint}/tasks/${task.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -67,7 +70,7 @@ const App = () => {
         const task = tasks.find(task => task.id === selectedTaskId);
         if (!task) return;
         try {
-            const response = await fetch(`http://localhost:8080/tasks/${task.id}`, {
+            const response = await fetch(`${goAppEndpoint}/tasks/${task.id}`, {
                 method: 'DELETE',
             });
             if (response.ok) {
