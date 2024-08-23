@@ -1,22 +1,46 @@
 services:
-  go_api:
-    container_name: go_api
-    volumes:
-      - ./backend/:/api/src
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    tty: true
-    stdin_open: true
+  backend:
+    build: ./backend
     ports:
-      - 8080:8080 
-  
-  react_app:
-    container_name: react_app
-    volumes:
-      - ./frontend/react_app/:/usr/src/app
+      - "8080:8080"
+    networks:
+      - todo-network
+    # service_name: "backend"  # Service Connectで利用
+
+  frontend:
     build: ./frontend/react_app
-    tty: true
-    stdin_open: true
     ports:
-      - 3000:3000
+      - "80:80"
+    networks:
+      - todo-network
+    depends_on:
+      - backend
+    # service_name: "frontend"  # Service Connectで利用
+
+networks:
+  todo-network:
+    driver: bridge
+
+# services:
+#   go_api:
+#     container_name: go_api
+#     volumes:
+#       - ./backend/:/api/src
+#     build:
+#       context: ./backend
+#       dockerfile: Dockerfile
+#     tty: true
+#     stdin_open: true
+#     ports:
+#       - 8080:8080 
+  
+#   react_app:
+#     container_name: react_app
+#     volumes:
+#       - ./frontend/react_app/:/usr/src/app
+#     build: ./frontend/react_app
+#     tty: true
+#     stdin_open: true
+#     ports:
+#       - 3000:3000
+

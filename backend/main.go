@@ -38,7 +38,7 @@ func main() {
 
 	// CORSミドルウェアを設定
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:3000", "http://react-app:3000", "http://react-app.go-react-app:3000"},
+		AllowedOrigins: []string{"http://127.0.0.1:80","http://127.0.0.1:3000","http://localhost:3000", "http://react-app:3000", "http://react-app.go-react-app:3000","http://localhost:80", "http://react-app:80", "http://react-app.go-react-app:80"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders: []string{"Content-Type"},
 		// AllowCredentials: true,

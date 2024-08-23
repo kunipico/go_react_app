@@ -10,8 +10,7 @@ const App = () => {
         getTasks();
     }, []);
 
-    // const goAppEndpoint = process.env.GO_APP_ENDPOINT || 'http://localhost:8080';
-    const goAppEndpoint = 'http://go-api.go-react-app:8080';
+    const goAppEndpoint = '/api';
 
     const getTasks = async () => {
         try {
